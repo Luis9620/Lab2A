@@ -1,5 +1,5 @@
 from Node import Node
-import sys
+from timeit import default_timer as timer
 
 
 def fill_list():         #Method for populating the array of the total number of user
@@ -37,6 +37,7 @@ def display_menu():
     while True:
         user_list.print_list()
         options = menu.keys()
+
         for entry in options:
             print(entry, menu[entry])
         selection = input("Please Select:")
@@ -44,27 +45,53 @@ def display_menu():
         if selection == '1':
             print("Loading...Please wait")
             user_list.print_list()
+            unsorted_start_timer = timer()
             find_duplicates_unsorted(user_list)
+            unsorted_end_timer = timer()
+            total_time = (unsorted_end_timer - unsorted_start_timer)
+            print("Time for duplicates in unsorted array: ", total_time)
             print("Done")
+            print("\n")
 
         elif selection == '2':
             user_list_bubble_sort = create_linkedlist(users)
             user_list_bubble_sort.print_list()
             print("Loading...Please wait")
+            bubble_sort_start_timer = timer()
             bubble_sort(user_list_bubble_sort)
+            bubble_sort_end_timer = timer()
+            total_time_bubble_sort = (bubble_sort_end_timer - bubble_sort_start_timer)
             user_list_bubble_sort.print_list()
+            print("Time for bubble sort: ", total_time_bubble_sort)
+            sorted_start_timer = timer()
             find_duplicates_sorted(user_list_bubble_sort)
+            sorted_end_timer = timer()
+            total_time_sorted = (sorted_end_timer - sorted_start_timer)
+            print(total_time_sorted)
             print("Done")
+            print("\n")
 
         elif selection == '3':
             user_list_merge_sort = create_linkedlist(users)
             user_list_merge_sort.print_list()
             print("Loading...Please wait")
-            merge_Sort(user_list_merge_sort)
+            merge_sort(user_list_merge_sort)
             user_list_merge_sort.print_list()
             print("Done")
+            print("\n")
         elif selection == '4':
-            break
+            user_list_boolean = create_linkedlist(users)
+            user_list_boolean.print_list()
+            print("Loading...Please wait")
+            Boolean_start_timer = timer()
+            boolean_list = check_Boolean(user_list_boolean)
+            Boolean_end_timer = timer()
+            total_time_Boolean = (Boolean_end_timer - Boolean_start_timer)
+            print(boolean_list)
+            check_boolean_list(boolean_list)
+            print(total_time_Boolean)
+            print("Done")
+            print("\n")
 
         elif selection == '5':
             print("Bye!")
@@ -73,7 +100,7 @@ def display_menu():
             print("Unknown Option Selected!")
 
 
-def find_duplicates_unsorted(list):
+def find_duplicates_unsorted(list):         #This method would find duplicates in a unsorted list
     x1 = list
     duplicate_elements = []
     while x1 is not None:
@@ -120,28 +147,28 @@ def swap(node1, node2):
 def merge_sort(list):
     if list is None or list.next is None:
         return list
-    middle = get_middle2(list)
-    rhalf = middle.next
+    middle = get_middle(list)
+    right_half = middle.next
     middle.next = None
 
-    return merge_list(merge_sort(list), merge_sort(rhalf))
+    return merge_list(merge_sort(list), merge_sort(right_half))
 
-def merge_list(lhalf, rhalf):
+def merge_list(left_half, right_half):
     result = Node(None, None)
 
-    while lhalf.item is not None:
-        if lhalf.next is None:
-            return rhalf
-        if rhalf.next is None:
-            return lhalf
-        if lhalf.item <= rhalf.item:
-            result = (lhalf.item, result)
+    while left_half.item is not None:
+        if left_half.next is None:
+            return right_half
+        if right_half.next is None:
+            return left_half
+        if left_half.item <= right_half.item:
+            result = (left_half.item, result)
             result.print_list()
-            lhalf = lhalf.next
+            left_half = left_half.next
         else:
-            result = (rhalf.item, result)
-            lhalf = lhalf.next
-        rhalf = rhalf.next
+            result = (right_half.item, result)
+            left_half = left_half.next
+        right_half = right_half.next
 
     return result
 
@@ -151,41 +178,40 @@ def get_middle(list):
         return list
     slow = list
     fast = list
-
     while fast.next is not None and fast.next.next is not None:
         slow = slow.next
         fast = fast.next.next
     return slow
 
 
-
-
-def merge_Sort(list):
+def check_Boolean(list):
+    seen = [False]*(list.length()+1)
     x1 = list
-    while x1 is not None:
-        x2 = x1.next
-        while x2 is not None:
-            if x2.item is None:
-                break
-            if x1.item > x2.item:
-                swap(x1, x2)
-            x2 = x2.next
+    x2 = x1.next
+    while x2 is not None:
+        if x1.item == x2.item:
+            seen[x1.item] = True
         x1 = x1.next
+        if x1 == x2:
+            x2 = x2.next
+            x1 = list
+    return seen
+
+
+def check_boolean_list(boolean_list):
+    duplicates = []
+    for i in range(len(boolean_list)):
+        if boolean_list[i] == True:
+            duplicates.append(i)
+    print("Duplicates: ", duplicates)
 
 
 def main():
-    sys.setrecursionlimit(1000000)
     display_menu() #Display the menu with the options
-    #usuarios = [5, 3, 2, 4, 1, 4,5]
+    #usuarios = [1, 0, 0, 3, 2, 3, 1]
     #usuarios_lista = create_linkedlist(usuarios)
     #usuarios_lista.print_list()
-    #bubble_sort(usuarios_lista)
-    #usuarios_lista.print_list()
-    #find_duplicates_sorted(usuarios_lista)
-
-
-
-
 
 
 main()
+
